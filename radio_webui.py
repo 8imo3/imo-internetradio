@@ -20,7 +20,9 @@ channels = {
 current_channel = None
 player_process = None
 player_lock = threading.Lock()
-volume_level = 32000  # érték: 0–32768, 50% kb.
+volume_level = 32000  # érték: 0–32768, 97% kb.
+DEFAULT_STREAM = "https://icast.connectmedia.hu/5001/live.mp3"
+
 
 # ▶️ Lejátszó indítása hangerővel
 def start_player(url):
@@ -196,6 +198,17 @@ def volume():
     change_volume(direction)
     return redirect(url_for("index"))
 
-# 🚀 Indítás
 if __name__ == "__main__":
+    import time
+
+    # Kis késleltetés, hogy biztos legyen, minden inicializálva
+    def start_default():
+        time.sleep(1)
+        start_player(DEFAULT_STREAM)
+        global current_channel
+        current_channel = "Retró Rádió"
+
+    threading.Thread(target=start_default, daemon=True).start()
+
+    # Majd indítsuk el a web UI-t
     app.run(host="0.0.0.0", port=8080)
