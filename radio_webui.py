@@ -1,6 +1,7 @@
 from flask import Flask, render_template_string, request, redirect, url_for
 import subprocess
 import threading
+import time
 
 app = Flask(__name__)
 
@@ -25,13 +26,20 @@ DEFAULT_STREAM = "https://icast.connectmedia.hu/5001/live.mp3"
 
 
 # ▶️ Lejátszó indítása hangerővel
-def start_player(url):
+def start_player(url, retries=5):
     global player_process
-    with player_lock:
-        if player_process:
-            player_process.terminate()
-            player_process.wait()
-        player_process = subprocess.Popen(["mpg123", "-f", str(volume_level), url])
+    attempt = 0
+    while attempt < retries:
+        try:
+            with player_lock:
+                if player_process:
+                    player_process.terminate()
+                    player_process.wait()
+                player_process = subprocess.Popen(["mpg123", "-f", str(volume_level), url])
+            break  # sikeres indítás
+        except Exception as e:
+            attempt += 1
+            time.sleep(2)
 
 # ⏹️ Lejátszó leállítása
 def stop_player():
