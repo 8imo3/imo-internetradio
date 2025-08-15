@@ -1,0 +1,14 @@
+[Unit]
+Description=Pi Internet Radio Web UI
+After=network-online.target sound.target
+Wants=network-online.target sound.target
+
+[Service]
+User=imo
+WorkingDirectory=/home/imo/git
+ExecStart=/usr/bin/python3 /home/imo/git/radio_webui.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
