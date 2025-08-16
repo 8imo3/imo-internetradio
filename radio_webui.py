@@ -21,7 +21,7 @@ channels = {
 current_channel = None
 player_process = None
 player_lock = threading.Lock()
-volume_level = 32000  # érték: 0–32768, 97% kb.
+volume_level = 32768  # érték: 0–32768,  kb.
 DEFAULT_STREAM = "https://icast.connectmedia.hu/5001/live.mp3"
 
 
@@ -211,9 +211,13 @@ if __name__ == "__main__":
 
     # Kis késleltetés, hogy biztos legyen, minden inicializálva
     def start_default():
-        time.sleep(1)
-        start_player(DEFAULT_STREAM)
         global current_channel
+        time.sleep(1)
+        # 💡 Hardveres hangerő beállítása induláskor is
+        percent = int(volume_level * 100 / 32768)
+        subprocess.run(["amixer", "set", "PCM", f"{percent}%"], check=False)
+
+        start_player(DEFAULT_STREAM)
         current_channel = "Retró Rádió"
 
     threading.Thread(target=start_default, daemon=True).start()
