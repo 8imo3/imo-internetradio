@@ -2,6 +2,29 @@ from flask import Flask, render_template_string, request, redirect, url_for
 import subprocess
 import threading
 import time
+import logging
+import os
+
+APP_HOME = "/home/imo/git"
+# 📂 Alkalmazás home mappa
+APP_HOME = "/home/imo/git"
+
+# 📂 Log könyvtár
+LOG_DIR = os.path.join(APP_HOME, "log")
+os.makedirs(LOG_DIR, exist_ok=True)
+
+# 📄 Log fájl elérési út
+LOG_FILE = os.path.join(LOG_DIR, "radio_buttons.log")
+
+
+# 🔧 Logging beállítás
+logging.basicConfig(
+    filename=LOG_FILE,
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    filemode="a"
+)
+
 
 app = Flask(__name__)
 
@@ -205,6 +228,32 @@ def volume():
     direction = request.form.get("dir")
     change_volume(direction)
     return redirect(url_for("index"))
+
+def button_loop():
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(17, GPIO.IN, pull_up_down=GPIO.PUD_UP)  # belső felhúzó
+    while True:
+        if GPIO.input(17) == GPIO.LOW:  # gomb lenyomva
+            logging.info("Gombnyomás: következő csatorna")
+
+            # csatornaváltás
+            global current_channel
+            names = list(channels.keys())
+            if current_channel and current_channel in names:
+                idx = names.index(current_channel)
+                next_idx = (idx + 1) % len(names)
+            else:
+                next_idx = 0
+            current_channel = names[next_idx]
+            start_player(channels[current_channel])
+            logging.info(f"Csatorna váltva: {current_channel}")
+
+            # várjunk, amíg elengeded a gombot (debounce)
+            while GPIO.input(17) == GPIO.LOW:
+                time.sleep(0.1)
+
+        time.sleep(0.1)
+
 
 if __name__ == "__main__":
     import time
