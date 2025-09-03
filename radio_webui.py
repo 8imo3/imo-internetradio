@@ -43,7 +43,7 @@ channels = {
 }
 
 # 📦 Globális változók
-current_channel = None
+current_channel = "Retró Rádió"  # alapértelmezett csatorna
 player_process = None
 player_lock = threading.Lock()
 volume_level = 32768  # érték: 0–32768,  kb.
@@ -232,8 +232,11 @@ def volume():
     return redirect(url_for("index"))
 
 def button_loop():
+    global player_process, current_channel
     GPIO.setmode(GPIO.BCM)
-    GPIO.setup(17, GPIO.IN, pull_up_down=GPIO.PUD_UP)  # belső felhúzó
+    GPIO.setup(17, GPIO.IN, pull_up_down=GPIO.PUD_UP)  # csatornaváltó gomb
+    GPIO.setup(18, GPIO.IN, pull_up_down=GPIO.PUD_UP)  # stop/start gomb
+
     while True:
         if GPIO.input(17) == GPIO.LOW:  # gomb lenyomva
             logging.info("Gombnyomás: következő csatorna")
@@ -255,7 +258,20 @@ def button_loop():
                 time.sleep(0.1)
 
         time.sleep(0.1)
+        # Stop/Start gomb
+        if GPIO.input(18) == GPIO.LOW:
+            logging.info("Stop/Start gomb lenyomva")
+            if player_process:
+                stop_player()
+                logging.info("Lejátszó leállítva")
+            else:
+                if current_channel:
+                    start_player(channels[current_channel])
+                    logging.info("Lejátszó elindítva")
+            while GPIO.input(18) == GPIO.LOW:
+                time.sleep(0.1)
 
+        time.sleep(0.1)
 
 if __name__ == "__main__":
     import time
