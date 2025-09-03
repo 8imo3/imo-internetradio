@@ -3,3 +3,30 @@
  * Running on http://127.0.0.1:8080
  * Running on http://192.168.0.111:8080
 2025-09-03 10:48:46,021 - INFO - [33mPress CTRL+C to quit[0m
+2025-09-03 11:19:47,434 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.0.111:8080
+2025-09-03 11:19:47,445 - INFO - [33mPress CTRL+C to quit[0m
+2025-09-03 11:20:13,913 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.0.111:8080
+2025-09-03 11:20:13,916 - INFO - [33mPress CTRL+C to quit[0m
+2025-09-03 11:20:43,450 - INFO - Gombnyomás: következő csatorna
+2025-09-03 11:20:43,482 - INFO - Csatorna váltva: BDPST Rock
+2025-09-03 11:20:53,631 - INFO - Gombnyomás: következő csatorna
+2025-09-03 11:20:53,671 - INFO - Csatorna váltva: Rádió 1
+2025-09-03 11:20:57,388 - INFO - Gombnyomás: következő csatorna
+2025-09-03 11:20:57,423 - INFO - Csatorna váltva: Rádio Szarvas
+2025-09-03 11:20:59,634 - INFO - Gombnyomás: következő csatorna
+2025-09-03 11:20:59,661 - INFO - Csatorna váltva: Dankó Rádió
+2025-09-03 11:21:01,469 - INFO - Gombnyomás: következő csatorna
+2025-09-03 11:21:01,501 - INFO - Csatorna váltva: Best FM
+2025-09-03 11:49:09,357 - INFO - 192.168.0.72 - - [03/Sep/2025 11:49:09] "GET / HTTP/1.1" 200 -
+2025-09-03 11:49:10,618 - INFO - 192.168.0.72 - - [03/Sep/2025 11:49:10] "[32mPOST /stop HTTP/1.1[0m" 302 -
+2025-09-03 11:49:11,043 - INFO - 192.168.0.72 - - [03/Sep/2025 11:49:11] "GET / HTTP/1.1" 200 -
+2025-09-03 12:09:47,958 - INFO - Gombnyomás: következő csatorna
+2025-09-03 12:09:47,971 - INFO - Csatorna váltva: Petőfi Rádió
+2025-09-03 13:03:19,908 - INFO - Gombnyomás: következő csatorna
+2025-09-03 13:03:19,941 - INFO - Csatorna váltva: Retró Rádió

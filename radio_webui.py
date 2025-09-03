@@ -4,6 +4,8 @@ import threading
 import time
 import logging
 import os
+import RPi.GPIO as GPIO
+
 
 APP_HOME = "/home/imo/git"
 # 📂 Alkalmazás home mappa
@@ -270,6 +272,7 @@ if __name__ == "__main__":
         current_channel = "Retró Rádió"
 
     threading.Thread(target=start_default, daemon=True).start()
+    threading.Thread(target=button_loop, daemon=True).start()
 
     # Majd indítsuk el a web UI-t
     app.run(host="0.0.0.0", port=8080)
