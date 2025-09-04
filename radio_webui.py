@@ -206,16 +206,18 @@ def play():
     if channel_name in channels:
         start_player(channels[channel_name])
         current_channel = channel_name
-        oled.display_text(current_channel)
+        is_playing = (player_process is not None)
+        oled.display_status(current_channel, is_playing)
+
     return redirect(url_for("index"))
 
 # ⏹️ Stop gomb
 @app.route("/stop", methods=["POST"])
 def stop():
     stop_player()
-    oled.display_text("")
-    oled.display_text("Stop")
     global current_channel
+    is_playing = (player_process is not None)
+    oled.display_status(current_channel,is_playing)
     return redirect(url_for("index"))
 
 # 🔀 Következő csatorna
@@ -230,7 +232,8 @@ def next_channel():
         next_idx = 0
     current_channel = names[next_idx]
     start_player(channels[current_channel])
-    oled.display_text(current_channel)
+    is_playing = (player_process is not None)
+    oled.display_status(current_channel, is_playing)
     return redirect(url_for("index"))
 
 # 🔊 Volume +/- route
@@ -260,7 +263,8 @@ def button_loop():
                 next_idx = 0
             current_channel = names[next_idx]
             start_player(channels[current_channel])
-            oled.display_text(current_channel)
+            is_playing = (player_process is not None)
+            oled.display_status(current_channel, is_playing)
             logging.info(f"Csatorna váltva: {current_channel}")
 
             # várjunk, amíg elengeded a gombot (debounce)
@@ -274,11 +278,13 @@ def button_loop():
             if player_process:
                 stop_player()
                 logging.info("Lejátszó leállítva")
-                oled.display_text("Stop")  # OLED törlés vagy "Stop" kiírás
+                is_playing = (player_process is not None)
+                oled.display_status(current_channel, is_playing)
             else:
                 if current_channel:
                     start_player(channels[current_channel])
-                    oled.display_text(current_channel)
+                    is_playing = (player_process is not None)
+                    oled.display_status(current_channel, is_playing)
                     logging.info("Lejátszó elindítva")
             while GPIO.input(18) == GPIO.LOW:
                 time.sleep(0.1)
@@ -298,7 +304,9 @@ if __name__ == "__main__":
 
         start_player(DEFAULT_STREAM)
         current_channel = "Retro Radio"
-        oled.display_text(current_channel)
+        is_playing = (player_process is not None)
+        oled.display_status(current_channel, is_playing)
+
 
     threading.Thread(target=start_default, daemon=True).start()
     threading.Thread(target=button_loop, daemon=True).start()
