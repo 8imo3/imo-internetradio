@@ -49,3 +49,39 @@ Installed in a virtual environment to keep dependencies isolated:
 
 This list ensures the project has all necessary dependencies and makes it straightforward for new setups or future maintenance.
 
+## Python Virtual Environment Setup
+
+To keep dependencies organized and avoid polluting the global Python installation, it is recommended to use a Python virtual environment for this project.
+
+### Creating a virtual environment
+
+Run the following command in the project root directory:
+python3 -m venv venv
+
+text
+
+This creates a `venv` directory containing the isolated Python environment.
+
+### Activating the virtual environment
+
+- **On Linux/macOS:**
+
+source venv/bin/activate
+
+## Incorporating the virtual environment in startup scripts
+
+To ensure the radio project runs with the correct environment, the startup script or service file should activate the virtual environment before running the Python scripts.
+
+For example, in a shell script:
+
+#!/bin/bash
+source /path/to/project/venv/bin/activate
+python /path/to/project/radio_webui.py
+
+text
+
+This guarantees the proper dependencies and Python version are used.
+
+---
+
+Using a virtual environment simplifies dependency management and helps avoid conflicts with system-wide packages
