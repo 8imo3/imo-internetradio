@@ -6,7 +6,7 @@ Wants=network-online.target sound.target
 [Service]
 User=imo
 WorkingDirectory=/home/imo/git
-ExecStart=/usr/bin/python3 /home/imo/git/radio_webui.py
+ExecStart=/home/imo/oled-env/bin/python3 /home/imo/git/radio_webui.py
 Restart=always
 RestartSec=5
 

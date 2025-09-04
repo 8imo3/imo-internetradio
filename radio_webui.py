@@ -5,9 +5,13 @@ import time
 import logging
 import os
 import RPi.GPIO as GPIO
+import board
+import busio
+import adafruit_ssd1306
+from PIL import Image, ImageDraw, ImageFont
+from oled_display import OledDisplay
 
 
-APP_HOME = "/home/imo/git"
 # 📂 Alkalmazás home mappa
 APP_HOME = "/home/imo/git"
 
@@ -28,22 +32,24 @@ logging.basicConfig(
 )
 
 
+oled = OledDisplay()
+
 app = Flask(__name__)
 
 # 🔗 Csatornalista
 channels = {
-       "Petőfi Rádió": "https://icast.connectmedia.hu/4738/mr2.mp3",
-       "Retró Rádió": "https://icast.connectmedia.hu/5001/live.mp3",
+       "Petofi Radio": "https://icast.connectmedia.hu/4738/mr2.mp3",
+       "Retro Radio": "https://icast.connectmedia.hu/5001/live.mp3",
        "BDPST Rock": "https://bdpstrock.hu/live_320.mp3",
-       "Rádió 1": "https://icast.connectmedia.hu/5201/live.mp3",
-       "Rádio Szarvas": "http://91.82.85.44:1630/radioszarvas.mp3",
-       "Dankó Rádió": "https://mr-stream.connectmedia.hu/4748/mr7.mp3",
+       "Radio 1": "https://icast.connectmedia.hu/5201/live.mp3",
+       "Radio Szarvas": "http://91.82.85.44:1630/radioszarvas.mp3",
+       "Danko Radio": "https://mr-stream.connectmedia.hu/4748/mr7.mp3",
        "Best FM": "http://stream.webthings.hu:8000/fm95-x-128.mp3",
-       "Szakcsi Rádió": "https://mr-stream.connectmedia.hu/4691/mr9.mp3"
+       "Szakcsi Radio": "https://mr-stream.connectmedia.hu/4691/mr9.mp3"
 }
 
 # 📦 Globális változók
-current_channel = "Retró Rádió"  # alapértelmezett csatorna
+current_channel = "Retro Radio"  # alapértelmezett csatorna
 player_process = None
 player_lock = threading.Lock()
 volume_level = 32768  # érték: 0–32768,  kb.
@@ -200,14 +206,16 @@ def play():
     if channel_name in channels:
         start_player(channels[channel_name])
         current_channel = channel_name
+        oled.display_text(current_channel)
     return redirect(url_for("index"))
 
 # ⏹️ Stop gomb
 @app.route("/stop", methods=["POST"])
 def stop():
     stop_player()
+    oled.display_text("")
+    oled.display_text("Stop")
     global current_channel
-    current_channel = None
     return redirect(url_for("index"))
 
 # 🔀 Következő csatorna
@@ -222,6 +230,7 @@ def next_channel():
         next_idx = 0
     current_channel = names[next_idx]
     start_player(channels[current_channel])
+    oled.display_text(current_channel)
     return redirect(url_for("index"))
 
 # 🔊 Volume +/- route
@@ -251,6 +260,7 @@ def button_loop():
                 next_idx = 0
             current_channel = names[next_idx]
             start_player(channels[current_channel])
+            oled.display_text(current_channel)
             logging.info(f"Csatorna váltva: {current_channel}")
 
             # várjunk, amíg elengeded a gombot (debounce)
@@ -264,9 +274,11 @@ def button_loop():
             if player_process:
                 stop_player()
                 logging.info("Lejátszó leállítva")
+                oled.display_text("Stop")  # OLED törlés vagy "Stop" kiírás
             else:
                 if current_channel:
                     start_player(channels[current_channel])
+                    oled.display_text(current_channel)
                     logging.info("Lejátszó elindítva")
             while GPIO.input(18) == GPIO.LOW:
                 time.sleep(0.1)
@@ -285,7 +297,8 @@ if __name__ == "__main__":
         subprocess.run(["amixer", "set", "PCM", f"{percent}%"], check=False)
 
         start_player(DEFAULT_STREAM)
-        current_channel = "Retró Rádió"
+        current_channel = "Retro Radio"
+        oled.display_text(current_channel)
 
     threading.Thread(target=start_default, daemon=True).start()
     threading.Thread(target=button_loop, daemon=True).start()
