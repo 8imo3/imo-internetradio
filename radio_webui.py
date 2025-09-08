@@ -45,8 +45,8 @@ channels = {
        "Radio Szarvas": "http://91.82.85.44:1630/radioszarvas.mp3",
        "Danko Radio": "https://mr-stream.connectmedia.hu/4748/mr7.mp3",
        "Best FM": "http://stream.webthings.hu:8000/fm95-x-128.mp3",
-       "Szakcsi Radio": "https://mr-stream.connectmedia.hu/4691/mr9.mp3"
-       "Radio Koko":"https://az10.yesstreaming.net:8210/radiokoko.mp3"
+       "Szakcsi Radio": "https://mr-stream.connectmedia.hu/4691/mr9.mp3",
+       "Radio Koko": "https://az10.yesstreaming.net:8210/radiokoko.mp3",
        "Aktiv Radio": "http://aktivradio.hu:8000/aktiv.mp3"
 }
 
