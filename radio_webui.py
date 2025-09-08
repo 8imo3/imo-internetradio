@@ -91,10 +91,12 @@ def start_player(url, retries=5):
                     player_process.terminate()
                     player_process.wait()
                 player_process = subprocess.Popen(["mpg123", "-f", str(volume_level), url])
-            break  # sikeres indítás
+            return True  # sikeres indítás
         except Exception as e:
+            logging.error(f"Lejátszó indítási hiba: {e}")
             attempt += 1
             time.sleep(2)
+    return False  # sikertelen indítás
 
 # ⏹️ Lejátszó leállítása
 def stop_player():
@@ -228,11 +230,14 @@ def play():
     global current_channel
     channel_name = request.form.get("channel")
     if channel_name in channels:
-        start_player(channels[channel_name])
+        success = start_player(channels[channel_name])
         current_channel = channel_name
         is_playing = (player_process is not None)
-        oled.display_status(current_channel, is_playing)
 
+        if success:
+            oled.display_status(current_channel, is_playing)
+        else:
+            oled.display_error("Playback Error")
     return redirect(url_for("index"))
 
 # ⏹️ Stop gomb
@@ -307,13 +312,15 @@ def button_loop():
             else:
                 if current_channel:
                     if not wifi_is_connected():
-                       logging.warning("WiFi nem csatlakoztatva, újraindítás...")
-                       restart_wifi()
-                       
-                    start_player(channels[current_channel])
+                        logging.warning("WiFi kapcsolat nincs, újraindítás...")
+                        restart_wifi()
+                        time.sleep(3)
+                    success = start_player(channels[current_channel])
                     is_playing = (player_process is not None)
-                    oled.display_status(current_channel, is_playing)
-                    logging.info("Lejátszó elindítva")
+                    if success:
+                        oled.display_status(current_channel, is_playing)
+                    else:
+                        oled.display_error("Playback Error")
             while GPIO.input(18) == GPIO.LOW:
                 time.sleep(0.1)
 

@@ -55,3 +55,21 @@ class OledDisplay:
 
        self.oled.image(image)
        self.oled.show()
+
+def display_error(self, message):
+    self.oled.fill(0)
+    image = Image.new("1", (self.oled.width, self.oled.height))
+    draw = ImageDraw.Draw(image)
+
+    import os
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    font_path = os.path.join(base_dir, "DejaVuSans.ttf")
+    font = ImageFont.truetype(font_path, 16)
+
+    bbox = draw.textbbox((0, 0), message, font=font)
+    x = (self.oled.width - (bbox[2] - bbox[0])) // 2
+    y = (self.oled.height - (bbox[3] - bbox[1])) // 2
+    draw.text((x, y), message, font=font, fill=255)
+
+    self.oled.image(image)
+    self.oled.show()
