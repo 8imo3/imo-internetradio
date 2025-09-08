@@ -57,6 +57,28 @@ player_lock = threading.Lock()
 volume_level = 32768  # érték: 0–32768,  kb.
 DEFAULT_STREAM = "https://icast.connectmedia.hu/5001/live.mp3"
 
+def wifi_is_connected():
+    try:
+        result = subprocess.run(['nmcli', '-t', '-f', 'WIFI', 'g'], capture_output=True, text=True)
+        wifi_status = result.stdout.strip()
+        if wifi_status != 'enabled':
+            return False
+        conn = subprocess.run(['nmcli', '-t', '-f', 'ACTIVE,DEVICE,TYPE', 'con', 'show', '--active'], capture_output=True, text=True)
+        for line in conn.stdout.strip().split('\n'):
+            parts = line.split(':')
+            if len(parts) >= 3 and parts[0] == 'yes' and parts[2] == 'wifi':
+                return True
+        return False
+    except Exception as e:
+        logging.error(f"WiFi ellenőrzési hiba: {e}")
+        return False
+
+def restart_wifi():
+    logging.info("WiFi újraindítása...")
+    subprocess.run(['nmcli', 'radio', 'wifi', 'off'])
+    time.sleep(2)
+    subprocess.run(['nmcli', 'radio', 'wifi', 'on'])
+    time.sleep(5)  # adj időt a csatlakozásra
 
 # ▶️ Lejátszó indítása hangerővel
 def start_player(url, retries=5):
@@ -284,6 +306,10 @@ def button_loop():
                 oled.display_status(current_channel, is_playing)
             else:
                 if current_channel:
+                    if not wifi_is_connected():
+                       logging.warning("WiFi nem csatlakoztatva, újraindítás...")
+                       restart_wifi()
+                       
                     start_player(channels[current_channel])
                     is_playing = (player_process is not None)
                     oled.display_status(current_channel, is_playing)
