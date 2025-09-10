@@ -61,11 +61,11 @@ DEFAULT_STREAM = "https://icast.connectmedia.hu/5001/live.mp3"
 
 def wifi_is_connected():
     try:
-        result = subprocess.run(['nmcli', '-t', '-f', 'WIFI', 'g'], capture_output=True, text=True)
+        result = subprocess.run(['sudo', 'nmcli', '-t', '-f', 'WIFI', 'g'], capture_output=True, text=True)
         wifi_status = result.stdout.strip()
         if wifi_status != 'enabled':
             return False
-        conn = subprocess.run(['nmcli', '-t', '-f', 'ACTIVE,DEVICE,TYPE', 'con', 'show', '--active'], capture_output=True, text=True)
+        conn = subprocess.run(['sudo', 'nmcli', '-t', '-f', 'ACTIVE,DEVICE,TYPE', 'con', 'show', '--active'], capture_output=True, text=True)
         for line in conn.stdout.strip().split('\n'):
             parts = line.split(':')
             if len(parts) >= 3 and parts[0] == 'yes' and parts[2] == 'wifi':
@@ -77,9 +77,9 @@ def wifi_is_connected():
 
 def restart_wifi():
     logging.info("WiFi újraindítása...")
-    subprocess.run(['nmcli', 'radio', 'wifi', 'off'])
+    subprocess.run(['sudo', 'nmcli', 'radio', 'wifi', 'off'])
     time.sleep(2)
-    subprocess.run(['nmcli', 'radio', 'wifi', 'on'])
+    subprocess.run(['sudo', 'nmcli', 'radio', 'wifi', 'on'])
     time.sleep(5)  # adj időt a csatlakozásra
 
 # ▶️ Lejátszó indítása hangerővel
