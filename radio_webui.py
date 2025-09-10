@@ -55,6 +55,8 @@ current_channel = "Retro Radio"  # alapértelmezett csatorna
 player_process = None
 player_lock = threading.Lock()
 volume_level = 32768  # érték: 0–32768,  kb.
+wifi_reconnect_stop_event = threading.Event()
+wifi_reconnect_thread = None
 DEFAULT_STREAM = "https://icast.connectmedia.hu/5001/live.mp3"
 
 def wifi_is_connected():
@@ -272,6 +274,20 @@ def volume():
     change_volume(direction)
     return redirect(url_for("index"))
 
+def start_wifi_reconnect_display():
+    global wifi_reconnect_stop_event, wifi_reconnect_thread
+    if wifi_reconnect_thread and wifi_reconnect_thread.is_alive():
+        return
+    wifi_reconnect_stop_event.clear()
+    wifi_reconnect_thread = threading.Thread(target=oled.display_wifi_reconnecting, args=(wifi_reconnect_stop_event,), daemon=True)
+    wifi_reconnect_thread.start()
+
+def stop_wifi_reconnect_display():
+    global wifi_reconnect_stop_event, wifi_reconnect_thread
+    if wifi_reconnect_thread and wifi_reconnect_thread.is_alive():
+        wifi_reconnect_stop_event.set()
+        wifi_reconnect_thread.join()
+
 def button_loop():
     global player_process, current_channel
     GPIO.setmode(GPIO.BCM)
@@ -313,8 +329,11 @@ def button_loop():
                 if current_channel:
                     if not wifi_is_connected():
                         logging.warning("WiFi kapcsolat nincs, újraindítás...")
+                        start_wifi_reconnect_display()
                         restart_wifi()
                         time.sleep(3)
+                        stop_wifi_reconnect_display()
+
                     success = start_player(channels[current_channel])
                     is_playing = (player_process is not None)
                     if success:
