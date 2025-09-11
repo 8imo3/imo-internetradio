@@ -327,13 +327,6 @@ def button_loop():
                 oled.display_status(current_channel, is_playing)
             else:
                 if current_channel:
-                    if not wifi_is_connected():
-                        logging.warning("WiFi kapcsolat nincs, újraindítás...")
-                        start_wifi_reconnect_display()
-                        restart_wifi()
-                        time.sleep(3)
-                        stop_wifi_reconnect_display()
-
                     success = start_player(channels[current_channel])
                     is_playing = (player_process is not None)
                     if success:
