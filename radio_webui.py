@@ -283,7 +283,7 @@ def volume():
 def periodic_oled_update():
     while True:
         is_playing = (player_process is not None)
-        update_display_wifi_status(oled, current_channel, is_playing)
+        update_display_wifi_status(oled, current_channel, is_playing,volume)
         time.sleep(1)
 
 def button_loop():
