@@ -328,10 +328,8 @@ def button_loop():
                 time.sleep(0.1)
     # Wi-Fi és lejátszás státusz kijelzés egy helyen:
         is_playing = (player_process is not None)
-        if not wifi_is_connected():
-            oled.display_error("Wi-Fi OFFLINE")
-        else:
-            oled.display_status(current_channel, is_playing)
+        update_display_wifi_status(oled, current_channel, is_playing)
+        
         time.sleep(0.5)
 
 if __name__ == "__main__":
