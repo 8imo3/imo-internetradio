@@ -80,6 +80,12 @@ def restart_wifi():
     subprocess.run(['nmcli', 'radio', 'wifi', 'on'])
     time.sleep(5)  # adj időt a csatlakozásra
 
+def update_display_wifi_status(oled, channel, is_playing, volume):
+    if not wifi_is_connected():
+        oled.display_error("Wi-Fi OFFLINE")
+    else:
+        oled.display_status(channel, is_playing, volume)    
+
 # ▶️ Lejátszó indítása hangerővel
 def start_player(url, retries=5):
     global player_process
@@ -124,6 +130,7 @@ def change_volume(direction):
 
 def get_volume():
     return int(volume_level * 100 / 32768)
+
 
 # 🌐 Főoldal
 @app.route("/")
@@ -319,8 +326,13 @@ def button_loop():
                         oled.display_error("Playback Error")
             while GPIO.input(18) == GPIO.LOW:
                 time.sleep(0.1)
-
-        time.sleep(0.1)
+    # Wi-Fi és lejátszás státusz kijelzés egy helyen:
+        is_playing = (player_process is not None)
+        if not wifi_is_connected():
+            oled.display_error("Wi-Fi OFFLINE")
+        else:
+            oled.display_status(current_channel, is_playing)
+        time.sleep(0.5)
 
 if __name__ == "__main__":
     import time
