@@ -279,6 +279,13 @@ def volume():
     change_volume(direction)
     return redirect(url_for("index"))
 
+# OLED kijelző frissítése WiFi státusszal
+def periodic_oled_update():
+    while True:
+        is_playing = (player_process is not None)
+        update_display_wifi_status(oled, current_channel, is_playing)
+        time.sleep(1)
+
 def button_loop():
     global player_process, current_channel
     GPIO.setmode(GPIO.BCM)
@@ -326,11 +333,8 @@ def button_loop():
                         oled.display_error("Playback Error")
             while GPIO.input(18) == GPIO.LOW:
                 time.sleep(0.1)
-    # Wi-Fi és lejátszás státusz kijelzés egy helyen:
-        is_playing = (player_process is not None)
-        update_display_wifi_status(oled, current_channel, is_playing)
         
-        time.sleep(0.5)
+        time.sleep(0.1)
 
 if __name__ == "__main__":
     import time
@@ -351,6 +355,8 @@ if __name__ == "__main__":
 
     threading.Thread(target=start_default, daemon=True).start()
     threading.Thread(target=button_loop, daemon=True).start()
+    threading.Thread(target=periodic_oled_update, daemon=True).start()
+
 
     # Majd indítsuk el a web UI-t
     app.run(host="0.0.0.0", port=8080)
