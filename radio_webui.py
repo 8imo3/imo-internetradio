@@ -8,12 +8,15 @@ import RPi.GPIO as GPIO
 import board
 import busio
 import adafruit_ssd1306
+import random
 from PIL import Image, ImageDraw, ImageFont
 from oled_display import OledDisplay
 
 
 # 📂 Alkalmazás home mappa
 APP_HOME = "/home/imo/git"
+# Zenekönyvtár
+MUSIC_DIR = "/home/imo/zene"
 
 # 📂 Log könyvtár
 LOG_DIR = os.path.join(APP_HOME, "log")
@@ -48,6 +51,7 @@ channels = {
        "Szakcsi Radio": "https://mr-stream.connectmedia.hu/4691/mr9.mp3",
        "Radio Koko": "https://az10.yesstreaming.net:8210/radiokoko.mp3",
        "Aktiv Radio": "http://aktivradio.hu:8000/aktiv.mp3"
+       "Local Music": "LOCAL_FILE"       
 }
 
 # 📦 Globális változók
@@ -80,9 +84,29 @@ def restart_wifi():
     subprocess.run(['nmcli', 'radio', 'wifi', 'on'])
     time.sleep(5)  # adj időt a csatlakozásra
 
+def update_display_wifi_status(oled, channel, is_playing, volume):
+    if not wifi_is_connected():
+        oled.display_error("Wi-Fi OFFLINE")
+    else:
+        oled.display_status(channel, is_playing, volume)    
+
 # ▶️ Lejátszó indítása hangerővel
 def start_player(url, retries=5):
     global player_process
+    if url == "LOCAL_FILE":
+        try:
+            songs = [f for f in os.listdir(MUSIC_DIR) if f.endswith(('.mp3', '.MP3'))]
+            if songs:
+                random_song = random.choice(songs)
+                url = os.path.join(MUSIC_DIR, random_song)
+                logging.info(f"Helyi zene kiválasztva: {random_song}")
+            else:
+                logging.error("Nincs mp3 fájl a mappában!")
+                return False
+        except Exception as e:
+            logging.error(f"Hiba a mappabeolvasásnál: {e}")
+            return False
+
     attempt = 0
     while attempt < retries:
         try:
@@ -124,6 +148,7 @@ def change_volume(direction):
 
 def get_volume():
     return int(volume_level * 100 / 32768)
+
 
 # 🌐 Főoldal
 @app.route("/")
@@ -272,6 +297,13 @@ def volume():
     change_volume(direction)
     return redirect(url_for("index"))
 
+# OLED kijelző frissítése WiFi státusszal
+def periodic_oled_update():
+    while True:
+        is_playing = (player_process is not None)
+        update_display_wifi_status(oled, current_channel, is_playing,volume)
+        time.sleep(1)
+
 def button_loop():
     global player_process, current_channel
     GPIO.setmode(GPIO.BCM)
@@ -319,7 +351,7 @@ def button_loop():
                         oled.display_error("Playback Error")
             while GPIO.input(18) == GPIO.LOW:
                 time.sleep(0.1)
-
+        
         time.sleep(0.1)
 
 if __name__ == "__main__":
@@ -341,6 +373,8 @@ if __name__ == "__main__":
 
     threading.Thread(target=start_default, daemon=True).start()
     threading.Thread(target=button_loop, daemon=True).start()
+    threading.Thread(target=periodic_oled_update, daemon=True).start()
+
 
     # Majd indítsuk el a web UI-t
     app.run(host="0.0.0.0", port=8080)
