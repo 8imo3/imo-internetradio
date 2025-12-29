@@ -50,8 +50,8 @@ channels = {
        "Best FM": "http://stream.webthings.hu:8000/fm95-x-128.mp3",
        "Szakcsi Radio": "https://mr-stream.connectmedia.hu/4691/mr9.mp3",
        "Radio Koko": "https://az10.yesstreaming.net:8210/radiokoko.mp3",
-       "Aktiv Radio": "http://aktivradio.hu:8000/aktiv.mp3"
-       "Local Music": "LOCAL_FILE"       
+       "Aktiv Radio": "http://aktivradio.hu:8000/aktiv.mp3",
+       "Local Music": "LOCAL_FILE"
 }
 
 # 📦 Globális változók
