@@ -51,6 +51,7 @@ channels = {
        "Szakcsi Radio": "https://mr-stream.connectmedia.hu/4691/mr9.mp3",
        "Radio Koko": "https://az10.yesstreaming.net:8210/radiokoko.mp3",
        "Aktiv Radio": "http://aktivradio.hu:8000/aktiv.mp3",
+       "Juventus Radio": "http://s2.audiostream.hu:8080/juventus_192k",
        "Local Music": "LOCAL_FILE"
 }
 
@@ -366,7 +367,7 @@ if __name__ == "__main__":
         subprocess.run(["amixer", "set", "PCM", f"{percent}%"], check=False)
 
         start_player(DEFAULT_STREAM)
-        current_channel = "Retro Radio"
+        current_channel = "Juventus Radio"
         is_playing = (player_process is not None)
         oled.display_status(current_channel, is_playing)
 
