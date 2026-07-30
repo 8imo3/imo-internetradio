@@ -49,9 +49,9 @@ channels = {
        "Danko Radio": "https://mr-stream.connectmedia.hu/4748/mr7.mp3",
        "Best FM": "http://stream.webthings.hu:8000/fm95-x-128.mp3",
        "Szakcsi Radio": "https://mr-stream.connectmedia.hu/4691/mr9.mp3",
-       "Radio Koko": "https://az10.yesstreaming.net:8210/radiokoko.mp3",
        "Aktiv Radio": "http://aktivradio.hu:8000/aktiv.mp3",
        "Juventus Radio": "http://s2.audiostream.hu:8080/juventus_192k",
+       "Roxy Radio": "https://s2.audiostream.hu/roxy_192k",
        "Local Music": "LOCAL_FILE"
 }
 
