@@ -60,7 +60,7 @@ current_channel = "Retro Radio"  # alapértelmezett csatorna
 player_process = None
 player_lock = threading.Lock()
 volume_level = 32768  # érték: 0–32768,  kb.
-DEFAULT_STREAM = "https://icast.connectmedia.hu/5001/live.mp3"
+DEFAULT_STREAM = "http://s2.audiostream.hu:8080/juventus_192k"
 
 def wifi_is_connected():
     try:
