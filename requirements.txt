@@ -1,0 +1,10 @@
+# Web interface
+Flask
+
+# Raspberry Pi hardware and OLED display
+RPi.GPIO
+adafruit-blinka
+adafruit-circuitpython-ssd1306
+
+# OLED text rendering
+Pillow
